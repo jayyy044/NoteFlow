@@ -1,116 +1,94 @@
-.logo.vite:hover {
-  filter: drop-shadow(0 0 2em #747bff);
+/* ── Fonts ────────────────────────────────────────────────── */
+@font-face {
+  font-family: 'Geist Mono';
+  src: url('./assets/fonts/GeistMono[wght].ttf') format('truetype');
+  font-weight: 100 900;
+  font-style: normal;
 }
 
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafb);
-}
+/* ── Variables ────────────────────────────────────────────── */
 :root {
-  font-family: Inter, Avenir, Helvetica, Arial, sans-serif;
-  font-size: 16px;
-  line-height: 24px;
-  font-weight: 400;
+  /* --font-mono: "Geist Mono", monospace;
 
-  color: #0f0f0f;
-  background-color: #f6f6f6;
+  --sidebar-width-open: 275px;
+  --sidebar-width-closed: 70px;
+  --toolbar-height: 65px;
 
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  -webkit-text-size-adjust: 100%;
+  --bg-base: #131313;
+  --bg-elevated: #1c1c1c;
+  --bg-elevated-hover: #3a3a3a;
+  --bg-sidebar: #252525;
+  --bg-toolbar: #2a2a2a;
+  --bg-canvas: #1e1e1e;
+
+  --border-color: #3a3a3a;
+
+  --accent: #336bfd;
+  --accent-hover: #4b7dfa;
+
+  --transition: 0.3s ease; */
+
+
+
+    /* Fonts */
+  --font-geist-mono: "Geist Mono", monospace;
+  --font-mono: var(--font-geist-mono);
+
+  /* Sidebar */
+  --sidebar-width-open: 275px;
+  --sidebar-width-closed: 70px;
+  
+  /* Layout & Colors */
+  --toolbar-height: 65px;
+  --bg-dark: #1a1a1a;
+  
+  --bg-sidebar: #252525;
+  --bg-toolbar: #2a2a2a;
+  --bg-canvas: #1e1e1e;
+  --border-color: #3a3a3a;
+
+
+
+  /* Accents & Styles */
+  --accent-primary: #336bfd;
+  --accent-primary-hover: #4b7dfa;
+  --transition-normal: 0.3s ease;
+  
+  
+  
+  --bg-color:#131313;
+  --bg-lighter:rgb(28, 28, 28);
+  --bg-lighter-hover: rgb(58, 58, 58);
+
+
+
+  --bg-base: #131313;
+
+  --accent-primary: #336bfd;
 }
 
-.container {
+/* ── Reset ────────────────────────────────────────────────── */
+*,
+*::before,
+*::after {
   margin: 0;
-  padding-top: 10vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  text-align: center;
+  padding: 0;
+  box-sizing: border-box;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: 0.75s;
+/* ── Root Layout ──────────────────────────────────────────── */
+html,
+body,
+#root {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
 }
 
-.logo.tauri:hover {
-  filter: drop-shadow(0 0 2em #24c8db);
-}
-
-.row {
-  display: flex;
-  justify-content: center;
-}
-
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-
-a:hover {
-  color: #535bf2;
-}
-
-h1 {
-  text-align: center;
-}
-
-input,
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  color: #0f0f0f;
-  background-color: #ffffff;
-  transition: border-color 0.25s;
-  box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2);
-}
-
-button {
-  cursor: pointer;
-}
-
-button:hover {
-  border-color: #396cd8;
-}
-button:active {
-  border-color: #396cd8;
-  background-color: #e8e8e8;
-}
-
-input,
-button {
-  outline: none;
-}
-
-#greet-input {
-  margin-right: 5px;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    color: #f6f6f6;
-    background-color: #2f2f2f;
-  }
-
-  a:hover {
-    color: #24c8db;
-  }
-
-  input,
-  button {
-    color: #ffffff;
-    background-color: #0f0f0f98;
-  }
-  button:active {
-    background-color: #0f0f0f69;
-  }
+/* ── Base Styles ──────────────────────────────────────────── */
+body {
+  font-family: var(--font-mono);
+  background-color: var(--bg-base);
+  color:white;
+  -webkit-font-smoothing: antialiased;
 }

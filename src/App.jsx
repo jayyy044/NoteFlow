@@ -1,50 +1,56 @@
-import { useState } from "react";
-import reactLogo from "./assets/react.svg";
+import { useState, useEffect } from "react";
+import { load } from "@tauri-apps/plugin-store";
 import { invoke } from "@tauri-apps/api/core";
+import FolderForm from "./components/FolderForm/FolderForm";
 import "./App.css";
 
 function App() {
-  const [greetMsg, setGreetMsg] = useState("");
-  const [name, setName] = useState("");
+  const [isSetupComplete, setIsSetupComplete] = useState(false);
+  const [loading, setLoading] = useState(true);
 
-  async function greet() {
-    // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
-    setGreetMsg(await invoke("greet", { name }));
+  useEffect(() => {
+    checkSetup();
+  }, []);
+
+  async function checkSetup() {
+    try {
+      const store = await load("settings.json", { autoSave: true });
+      const folder = await store.get("notesFolder");
+      if (folder) {
+        setIsSetupComplete(true);
+      }
+    } catch (error) {
+      console.error("Error checking setup:", error);
+    } finally {
+      setLoading(false);
+    }
   }
 
+  async function handleFolderSelected(folderPath) {
+    try {
+      // Call the Rust function to create the initial structure
+      await invoke("create_initial_structure", { notesFolder: folderPath });
+      
+      // Save the folder path to settings
+      const store = await load("settings.json", { autoSave: true });
+      await store.set("notesFolder", folderPath);
+      await store.save();
+      
+      setIsSetupComplete(true);
+    } catch (error) {
+      console.error("Error during setup:", error);
+    }
+  }
+
+  if (loading) return null;
+
   return (
-    <main className="container">
-      <h1>Welcome to Tauri + React</h1>
-
-      <div className="row">
-        <a href="https://vite.dev" target="_blank">
-          <img src="/vite.svg" className="logo vite" alt="Vite logo" />
-        </a>
-        <a href="https://tauri.app" target="_blank">
-          <img src="/tauri.svg" className="logo tauri" alt="Tauri logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <p>Click on the Tauri, Vite, and React logos to learn more.</p>
-
-      <form
-        className="row"
-        onSubmit={(e) => {
-          e.preventDefault();
-          greet();
-        }}
-      >
-        <input
-          id="greet-input"
-          onChange={(e) => setName(e.currentTarget.value)}
-          placeholder="Enter a name..."
-        />
-        <button type="submit">Greet</button>
-      </form>
-      <p>{greetMsg}</p>
-    </main>
+    <>
+      {isSetupComplete
+        ? <p>Hello</p>
+        : <FolderForm onFolderSelected={handleFolderSelected} />
+      }
+    </>
   );
 }
 
