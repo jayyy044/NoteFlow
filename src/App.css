@@ -31,12 +31,8 @@
 
 
     /* Fonts */
-  --font-geist-mono: "Geist Mono", monospace;
-  --font-mono: var(--font-geist-mono);
 
   /* Sidebar */
-  --sidebar-width-open: 275px;
-  --sidebar-width-closed: 70px;
   
   /* Layout & Colors */
   --toolbar-height: 65px;
@@ -57,14 +53,21 @@
   
   
   --bg-color:#131313;
-  --bg-lighter:rgb(28, 28, 28);
-  --bg-lighter-hover: rgb(58, 58, 58);
+  
 
 
 
   --bg-base: #131313;
+  --bg-lighter:rgb(28, 28, 28);
+  --bg-lighter-hover: rgb(58, 58, 58);
 
   --accent-primary: #336bfd;
+
+  --sidebar-width-open: 275px;
+  --sidebar-width-closed: 70px;
+
+  --font-geist-mono: "Geist Mono", monospace;
+  --font-mono: var(--font-geist-mono);
 }
 
 /* ── Reset ────────────────────────────────────────────────── */
