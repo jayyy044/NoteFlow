@@ -119,7 +119,6 @@ export function AppProvider({ children }) {
     const section = notebook?.sections?.find(s => s.id === sectionId);
 
     if (section && section.pages === null) {
-      console.log('reight place')
       try {
         const sectionData = await invoke('read_section', {
           notesFolder: notesFolder,
@@ -166,7 +165,6 @@ export function AppProvider({ children }) {
       }
     } 
     else {
-      console.log('wrote')
       setNotebooks(prevNotebooks =>
         prevNotebooks.map(nb =>
           nb.id === notebookId
@@ -184,6 +182,112 @@ export function AppProvider({ children }) {
     }
   }
 
+  async function renameNotebook(notebookId, newName) {
+    try {
+      await invoke('rename_notebook', {
+        notesFolder: notesFolder,
+        notebookId: notebookId,
+        newName: newName
+      });
+      
+      // Update local state - no refetch needed
+      setNotebooks(prevNotebooks =>
+        prevNotebooks.map(nb =>
+          nb.id === notebookId ? { ...nb, name: newName } : nb
+        )
+      );
+    } catch (error) {
+      console.error('Error renaming notebook:', error);
+    }
+  }
+
+  async function renameSection(notebookId, sectionId, newName) {
+  
+    try {
+      await invoke('rename_section', {
+        notesFolder: notesFolder,
+        notebookId: notebookId,
+        sectionId: sectionId,
+        newName: newName
+      });
+      
+      console.log('Rust command succeeded, updating state...');
+      
+      // Update local state
+      setNotebooks(prevNotebooks =>
+        prevNotebooks.map(nb => {
+          if (nb.id === notebookId && nb.sections) {
+            return {
+              ...nb,
+              sections: nb.sections.map(s =>
+                s.id === sectionId ? { ...s, name: newName } : s
+              )
+            };
+          }
+          return nb;  // ← This was missing/unclear in the original
+        })
+      );
+    } catch (error) {
+      console.error('Error renaming section:', error);
+    }
+  }
+
+  async function renamePage(notebookId, sectionId, pageId, newTitle) {
+    try {
+      await invoke('rename_page', {
+        notesFolder: notesFolder,
+        notebookId: notebookId,
+        sectionId: sectionId,
+        pageId: pageId,
+        newTitle: newTitle
+      });
+      
+      // Update local state - no refetch needed
+      setNotebooks(prevNotebooks =>
+        prevNotebooks.map(nb =>
+          nb.id === notebookId && nb.sections  // Add check
+            ? {
+                ...nb,
+                sections: nb.sections.map(s =>
+                  s.id === sectionId && s.pages  // Add check for s.pages
+                    ? {
+                        ...s,
+                        pages: s.pages.map(p =>
+                          p.id === pageId ? { ...p, title: newTitle } : p
+                        )
+                      }
+                    : s
+                )
+              }
+            : nb
+        )
+      );
+    } catch (error) {
+      console.error('Error renaming page:', error);
+    }
+  }
+
+  async function addNotebook() {
+    try {
+      const notebookDataJson = await invoke('add_notebook', {
+        notesFolder: notesFolder
+      });
+      
+      const newNotebook = JSON.parse(notebookDataJson);
+      
+      // Add to local state with sections set to null (not loaded yet)
+      setNotebooks(prevNotebooks => [
+        ...prevNotebooks,
+        {
+          ...newNotebook,
+          sections: null
+        }
+      ]);
+    } catch (error) {
+      console.error('Error adding notebook:', error);
+    }
+  }
+
 
  
   const value = {
@@ -193,7 +297,11 @@ export function AppProvider({ children }) {
     isSetupComplete,
     setupNotesFolder,
     toggleNotebook,
-    toggleSection
+    toggleSection,
+    renameNotebook,
+    renameSection,
+    renamePage,
+    addNotebook
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
