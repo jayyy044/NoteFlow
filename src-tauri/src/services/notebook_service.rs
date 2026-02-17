@@ -253,4 +253,31 @@ impl NotebookService {
         
         Ok(())
     }
+
+    pub fn delete_notebook(notes_folder: &str, notebook_id: &str) -> Result<(), String> {
+        let root = Path::new(notes_folder);
+        
+        // Remove from index.json
+        let index_path = root.join("index.json");
+        let mut notebooks: Vec<NotebookIndexItem> = {
+            let content = fs::read_to_string(&index_path).map_err(|e| e.to_string())?;
+            serde_json::from_str(&content).map_err(|e| e.to_string())?
+        };
+        
+        // Remove the notebook from the index
+        notebooks.retain(|nb| nb.id != notebook_id);
+        
+        fs::write(
+            &index_path,
+            serde_json::to_string_pretty(&notebooks).map_err(|e| e.to_string())?
+        ).map_err(|e| e.to_string())?;
+        
+        // Delete the entire notebook directory
+        let notebook_path = root.join(notebook_id);
+        if notebook_path.exists() {
+            fs::remove_dir_all(&notebook_path).map_err(|e| e.to_string())?;
+        }
+        
+        Ok(())
+    }
 }

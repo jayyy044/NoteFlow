@@ -30,3 +30,8 @@ pub fn rename_notebook(
 ) -> Result<(), String> {
     NotebookService::rename_notebook(&notes_folder, &notebook_id, &new_name)
 }
+
+#[tauri::command]
+pub fn delete_notebook(notes_folder: String, notebook_id: String) -> Result<(), String> {
+    NotebookService::delete_notebook(&notes_folder, &notebook_id)
+}

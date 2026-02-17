@@ -288,6 +288,142 @@ export function AppProvider({ children }) {
     }
   }
 
+  async function deleteNotebook(notebookId) {
+    try {
+      await invoke('delete_notebook', {
+        notesFolder: notesFolder,
+        notebookId: notebookId
+      });
+      
+      // Remove from local state
+      setNotebooks(prevNotebooks =>
+        prevNotebooks.filter(nb => nb.id !== notebookId)
+      );
+    } catch (error) {
+      console.error('Error deleting notebook:', error);
+    }
+  }
+
+  async function addSection(notebookId) {
+    try {
+      const sectionDataJson = await invoke('add_section', {
+        notesFolder: notesFolder,
+        notebookId: notebookId
+      });
+      
+      const newSection = JSON.parse(sectionDataJson);
+      
+      // Add to local state with pages set to null (not loaded yet)
+      setNotebooks(prevNotebooks =>
+        prevNotebooks.map(nb =>
+          nb.id === notebookId && nb.sections
+            ? {
+                ...nb,
+                sections: [
+                  ...nb.sections,
+                  {
+                    ...newSection,
+                    pages: null
+                  }
+                ]
+              }
+            : nb
+        )
+      );
+    } catch (error) {
+      console.error('Error adding section:', error);
+    }
+  }
+
+  async function deleteSection(notebookId, sectionId) {
+    try {
+      await invoke('delete_section', {
+        notesFolder: notesFolder,
+        notebookId: notebookId,
+        sectionId: sectionId
+      });
+      
+      // Remove from local state
+      setNotebooks(prevNotebooks =>
+        prevNotebooks.map(nb =>
+          nb.id === notebookId && nb.sections
+            ? {
+                ...nb,
+                sections: nb.sections.filter(s => s.id !== sectionId)
+              }
+            : nb
+        )
+      );
+    } catch (error) {
+      console.error('Error deleting section:', error);
+    }
+  }
+
+  async function addPage(notebookId, sectionId) {
+    try {
+      const pageDataJson = await invoke('add_page', {
+        notesFolder: notesFolder,
+        notebookId: notebookId,
+        sectionId: sectionId
+      });
+      
+      const newPage = JSON.parse(pageDataJson);
+      
+      // Add to local state
+      setNotebooks(prevNotebooks =>
+        prevNotebooks.map(nb =>
+          nb.id === notebookId && nb.sections
+            ? {
+                ...nb,
+                sections: nb.sections.map(s =>
+                  s.id === sectionId && s.pages
+                    ? {
+                        ...s,
+                        pages: [...s.pages, newPage]
+                      }
+                    : s
+                )
+              }
+            : nb
+        )
+      );
+    } catch (error) {
+      console.error('Error adding page:', error);
+    }
+  }
+
+  async function deletePage(notebookId, sectionId, pageId) {
+    try {
+      await invoke('delete_page', {
+        notesFolder: notesFolder,
+        notebookId: notebookId,
+        sectionId: sectionId,
+        pageId: pageId
+      });
+      
+      // Remove from local state
+      setNotebooks(prevNotebooks =>
+        prevNotebooks.map(nb =>
+          nb.id === notebookId && nb.sections
+            ? {
+                ...nb,
+                sections: nb.sections.map(s =>
+                  s.id === sectionId && s.pages
+                    ? {
+                        ...s,
+                        pages: s.pages.filter(p => p.id !== pageId)
+                      }
+                    : s
+                )
+              }
+            : nb
+        )
+      );
+    } catch (error) {
+      console.error('Error deleting page:', error);
+    }
+  }
+
 
  
   const value = {
@@ -301,7 +437,12 @@ export function AppProvider({ children }) {
     renameNotebook,
     renameSection,
     renamePage,
-    addNotebook
+    addNotebook,
+    deleteNotebook,
+    addSection,      
+    deleteSection,   
+    addPage,         
+    deletePage   
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
